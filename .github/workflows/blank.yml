@@ -28,7 +28,6 @@ jobs:
 
       - name: Steal file  
         run: |
-          git remote add origin https://github.com/RhythmActions/PhigrosActions.git
           git config core.sparsecheckout true
           echo "PrehandledIllu/" >> .git/info/sparse-checkout
           git pull origin main
