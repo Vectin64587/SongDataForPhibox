@@ -1,0 +1,51 @@
+name: Extract GameInformation
+
+on:
+  schedule:
+    - cron: '55 8 * * *'
+  watch:
+      types: [started]
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+env:
+  PYTHONIOENCODING: utf-8
+
+# Allow Release
+permissions: write-all
+
+jobs:
+  build:
+    name: 'Extract GameInformation Operations'
+    runs-on: "windows-latest"
+
+    steps:
+
+      - name: Checkout private repo
+        uses: actions/checkout@v2
+
+      - name: Steal file  
+        run: |
+          git init
+          git remote add origin https://github.com/RhythmActions/PhigrosActions.git
+          git config core.sparsecheckout true
+          echo "PrehandledIllu/" >> .git/info/sparse-checkout
+          git pull origin main
+          
+        shell: bash  
+
+      - name: commit
+        env:
+          useremail: ${{ secrets.GH_EMAIL }}
+        run: |
+          git config --global user.email useremail
+          git config --global user.name GithubActionBot
+          git add .
+          git commit -m "仓库更新" -a
+      
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GIT_AUTH_TOKEN }}
